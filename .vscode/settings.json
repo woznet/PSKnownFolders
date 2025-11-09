@@ -1,0 +1,21 @@
+{
+    "editor.wordWrap": "on",
+    "editor.aiStats.enabled": true,
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlayHints.padding": true,
+    "editor.linkedEditing": true,
+    "editor.selectionHighlightMultiline": true,
+    "dotnet.automaticallySyncWithActiveItem": true,
+    "editor.suggest.snippetsPreventQuickSuggestions": true,
+    "dataWrangler.experiments.copilot.enabled": true,
+    "github.copilot.chat.scopeSelection": true,
+    "workbench.editor.highlightModifiedTabs": true,
+    "workbench.editor.showTabIndex": false,
+    "workbench.editor.wrapTabs": true,
+    "terminal.integrated.tabs.defaultColor": "terminal.ansiBlack",
+    "workbench.view.alwaysShowHeaderActions": true,
+    "files.associations": {
+        "*.csproj": "msbuild"
+    }
+}
