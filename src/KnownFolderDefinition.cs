@@ -124,7 +124,7 @@ namespace WozDev.PSKnownFolders
 
         public override string ToString()
         {
-            return "(" + this.GetType().Name + ")";
+            return this.Name;
         }
     }
 }

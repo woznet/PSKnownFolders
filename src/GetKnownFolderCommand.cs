@@ -8,7 +8,8 @@ using WozDev.PSKnownFolders.Win32;
 
 namespace WozDev.PSKnownFolders
 {
-    [Cmdlet(VerbsCommon.Get, "KnownFolder", DefaultParameterSetName = "PerUser")]
+    [Cmdlet(VerbsCommon.Get, "PSKnownFolder", DefaultParameterSetName = "PerUser")]
+    [Alias("Get-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
     public sealed class GetKnownFolderCommand : PSCmdlet
     {
@@ -102,41 +103,6 @@ namespace WozDev.PSKnownFolders
             }
         }
 
-        /*
-                protected override void ProcessRecord()
-                {
-                    IEnumerable<IKnownFolder> result;
-                    switch (this.ParameterSetName)
-                    {
-                        case "ByName":
-                            result = this.GetByNames(this.Name);
-                            break;
-                        case "BySpecialFolder":
-                            Validate(this.SpecialFolder);
-                            result = this.GetByNames(this.SpecialFolder.Select(sf => sf == Environment.SpecialFolder.Personal ? "Personal" : sf.ToString()));
-                            break;
-                        case "ByFolderId":
-                            result = this.GetByIds(this.FolderId);
-                            break;
-                        case "PerUser":
-                            result = this.GetByIds(UserFolders);
-                            break;
-                        case "Public":
-                            result = this.GetByIds(PublicFolders);
-                            break;
-                        case "All":
-                            result = this.GetAll();
-                            break;
-                        default:
-                            throw new ArgumentException("Unsupported parameter set name: " + this.ParameterSetName);
-                    }
-
-                    foreach (var kf in result)
-                    {
-                        this.WriteObject(new KnownFolder(kf));
-                    }
-                }
-        */
         private static void Validate(IEnumerable<Environment.SpecialFolder> specialFolders)
         {
             foreach (var specialFolder in specialFolders)
@@ -152,14 +118,14 @@ namespace WozDev.PSKnownFolders
         {
             KNOWNFOLDERID[] ids;
 
-            object boxpIds = IntPtr.Zero;
-            var h = GCHandle.Alloc(boxpIds, GCHandleType.Pinned);
+            IntPtr ppIds = Marshal.AllocHGlobal(IntPtr.Size);
             try
             {
+                Marshal.WriteIntPtr(ppIds, IntPtr.Zero);
                 uint count = 0;
-                this.KnownFolderManager.GetFolderIds(h.AddrOfPinnedObject(), ref count);
-                IntPtr pIds = (IntPtr)boxpIds;
-                if (IntPtr.Zero == pIds)
+                this.KnownFolderManager.GetFolderIds(ppIds, ref count);
+                IntPtr pIds = Marshal.ReadIntPtr(ppIds);
+                if (pIds == IntPtr.Zero)
                 {
                     throw new InvalidOperationException("GetFolderIds returned NULL");
                 }
@@ -181,7 +147,7 @@ namespace WozDev.PSKnownFolders
             }
             finally
             {
-                h.Free();
+                Marshal.FreeHGlobal(ppIds);
             }
 
             var result = ids.Select(kfi => this.GetKnownFolderById(kfi));
@@ -199,16 +165,16 @@ namespace WozDev.PSKnownFolders
             return folderIds.Select(folderId => this.GetKnownFolderById(new KNOWNFOLDERID(folderId.ToString())));
         }
 
-        private IKnownFolder GetKnownFolderById(KNOWNFOLDERID KnownFolderId)
+        private IKnownFolder GetKnownFolderById(KNOWNFOLDERID knownFolderId)
         {
             IKnownFolder nativeKnownFolder;
             try
             {
-                this.KnownFolderManager.GetFolder(ref KnownFolderId, out nativeKnownFolder);
+                this.KnownFolderManager.GetFolder(ref knownFolderId, out nativeKnownFolder);
             }
             catch (FileNotFoundException x)
             {
-                throw new FileNotFoundException(string.Format("Known folder not found: {0}", KnownFolderId.value), x);
+                throw new FileNotFoundException(string.Format("Known folder not found: {0}", knownFolderId.value), x);
             }
 
             return nativeKnownFolder;

@@ -4,18 +4,18 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>PSKnownFolders</AssemblyName>
     <RootNamespace>WozDev.PSKnownFolders</RootNamespace>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <SignAssembly>false</SignAssembly>
-    <Title>PSKnownFolders</Title>
+    <Title>WozDev.PSKnownFolders</Title>
+    <Product>WozDev.PSKnownFolders</Product>
     <Authors>Woz</Authors>
     <Company>WozDev</Company>
+    <Copyright>Copyright © 2026</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageOutputPath>bin\$(Configuration)\</PackageOutputPath>
     <!-- Define the project version -->
-    <Version>2.0.0</Version>
+    <Version>2.5.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -34,19 +34,6 @@
     <OutputPath>bin\Release\</OutputPath>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-
-  <!-- Compile items -->
-  <ItemGroup>
-    <Compile Include="GetKnownFolderCommand.cs" />
-    <Compile Include="KnownFolder.cs" />
-    <Compile Include="KnownFolderCategory.cs" />
-    <Compile Include="KnownFolderDefinition.cs" />
-    <Compile Include="KnownFolderDefinitionFlags.cs" />
-    <Compile Include="KnownFolderRedirectionCapabilitiesExtensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MoveKnownFolderCommand.cs" />
-    <Compile Include="Win32\*.cs" />
-  </ItemGroup>
 
   <!-- Module content -->
   <ItemGroup>
@@ -73,6 +60,7 @@
 
     <!-- Copy DLL -->
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ModuleOutputPath)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).pdb" DestinationFolder="$(ModuleOutputPath)" />
 
     <!-- Copy module files -->
     <Copy SourceFiles="@(Content)" DestinationFolder="$(ModuleOutputPath)" />

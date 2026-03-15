@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using System.Management.Automation;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using WozDev.PSKnownFolders.Win32;
 
 namespace WozDev.PSKnownFolders
 {
-    [Cmdlet(VerbsCommon.Move, "KnownFolder", DefaultParameterSetName = "SingleFolder", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.High)]
+    [Cmdlet(VerbsCommon.Move, "PSKnownFolder", DefaultParameterSetName = "SingleFolder", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.High)]
+    [Alias("Move-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
     public sealed class RedirectKnownFolderCommand : PSCmdlet
     {
@@ -62,18 +62,18 @@ namespace WozDev.PSKnownFolders
             }
         }
 
-        private string DetermineNewPath(KnownFolder KnownFolder, string destinationPath)
+        private string DetermineNewPath(KnownFolder knownFolder, string destinationPath)
         {
-            var existingPath = KnownFolder.Path;
+            var existingPath = knownFolder.Path;
             if (string.IsNullOrEmpty(existingPath))
             {
-                throw new InvalidOperationException(string.Format("Unable to determine new path of folder '{0}': existing path is empty.", KnownFolder.Name));
+                throw new InvalidOperationException(string.Format("Unable to determine new path of folder '{0}': existing path is empty.", knownFolder.Name));
             }
 
             var existingDirectoryName = Path.GetFileName(existingPath);
             if (string.IsNullOrEmpty(existingDirectoryName))
             {
-                throw new InvalidOperationException(string.Format("Unable to determine new path of folder '{0}': cannot determine existing directory name.", KnownFolder.Name));
+                throw new InvalidOperationException(string.Format("Unable to determine new path of folder '{0}': cannot determine existing directory name.", knownFolder.Name));
             }
 
             return Path.Combine(destinationPath, existingDirectoryName);
@@ -111,19 +111,21 @@ namespace WozDev.PSKnownFolders
 
             string error;
             HResult hr = this.KnownFolderManager.Redirect(ref id, IntPtr.Zero, flags, newPath, 0, null, out error);
-            if (hr != HResult.S_OK)
+            int hrCode = unchecked((int)hr);
+            if (hrCode < 0)
             {
                 if (string.IsNullOrEmpty(error))
                 {
-                    Marshal.ThrowExceptionForHR(unchecked((int)hr));
-                    this.WriteWarning(string.Format("Redirection returned success code other than S_OK ({0})", hr));
+                    Marshal.ThrowExceptionForHR(hrCode);
                 }
                 else
                 {
-                    throw new TargetInvocationException(
-                        error,
-                        Marshal.GetExceptionForHR(unchecked((int)hr)));
+                    throw new COMException(error, hrCode);
                 }
+            }
+            else if (hr != HResult.S_OK)
+            {
+                this.WriteWarning(string.Format("Redirection returned success code other than S_OK ({0})", hr));
             }
 
             if (this.PassThru)
