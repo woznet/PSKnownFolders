@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PSKnownFolders</name>
+    </assembly>
+    <members>
+        <member name="T:WozDev.PSKnownFolders.Win32.HResult">
+            <summary>
+            Common <c>HRESULT</c> values obtained from <see href="http://msdn.microsoft.com/en-us/windows/desktop/aa378137(v=vs.85).aspx" />.
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.S_OK">
+            <summary>
+            Operation successful
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.S_FALSE">
+            <summary>
+            Some methods use S_FALSE to mean, roughly, a negative condition that is not a failure. 
+            It can also indicate a "no-op"—the method succeeded, but had no effect.
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_ABORT">
+            <summary>
+            Operation aborted 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_ACCESSDENIED">
+            <summary>
+            General access denied error 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_FAIL">
+            <summary>
+            Unspecified failure 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_HANDLE">
+            <summary>
+            Handle that is not valid 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_INVALIDARG">
+            <summary>
+            One or more arguments are not valid 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_NOINTERFACE">
+            <summary>
+            No such interface supported 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_NOTIMPL">
+            <summary>
+            Not implemented 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_OUTOFMEMORY">
+            <summary>
+            Failed to allocate necessary memory 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_POINTER">
+            <summary>
+            Pointer that is not valid 
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.Win32.HResult.E_UNEXPECTED">
+            <summary>
+            Unexpected failure 
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -142,15 +142,13 @@ namespace WozDev.PSKnownFolders
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
             if (_knownFolderManager != null)
             {
                 Marshal.ReleaseComObject(_knownFolderManager);
                 _knownFolderManager = null;
             }
-
-            base.Dispose(disposing);
         }
     }
 }
