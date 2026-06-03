@@ -73,7 +73,6 @@ namespace WozDev.PSKnownFolders
                     result = this.GetByNames(this.Name);
                     break;
                 case "BySpecialFolder":
-                    Validate(this.SpecialFolder);
                     result = this.GetByNames(this.SpecialFolder.Select(sf => sf == Environment.SpecialFolder.Personal ? "Personal" : sf.ToString()));
                     break;
                 case "ByFolderId":
@@ -103,18 +102,7 @@ namespace WozDev.PSKnownFolders
             }
         }
 
-        private static void Validate(IEnumerable<Environment.SpecialFolder> specialFolders)
-        {
-            foreach (var specialFolder in specialFolders)
-            {
-                if (!Enum.IsDefined(typeof(Environment.SpecialFolder), specialFolder))
-                {
-                    throw new ArgumentException("Invalid SpecialFolder value: " + specialFolder);
-                }
-            }
-        }
-
-        private IEnumerable<IKnownFolder> GetAll()
+        private List<IKnownFolder> GetAll()
         {
             KNOWNFOLDERID[] ids;
 
@@ -133,12 +121,9 @@ namespace WozDev.PSKnownFolders
                 try
                 {
                     ids = new KNOWNFOLDERID[count];
-                    var ptr = pIds.ToInt64();
-                    for (uint u = 0; u < count; ++u)
-                    {
-                        ids[u] = (KNOWNFOLDERID)Marshal.PtrToStructure((IntPtr)ptr, typeof(KNOWNFOLDERID));
-                        ptr += Marshal.SizeOf(typeof(KNOWNFOLDERID));
-                    }
+                    int stride = Marshal.SizeOf<KNOWNFOLDERID>();
+                    for (int u = 0; u < (int)count; u++)
+                        ids[u] = Marshal.PtrToStructure<KNOWNFOLDERID>(IntPtr.Add(pIds, u * stride));
                 }
                 finally
                 {
@@ -150,19 +135,33 @@ namespace WozDev.PSKnownFolders
                 Marshal.FreeHGlobal(ppIds);
             }
 
-            var result = ids.Select(kfi => this.GetKnownFolderById(kfi));
-
-            return result;
+            var folders = new List<IKnownFolder>(ids.Length);
+            foreach (var id in ids)
+            {
+                try
+                {
+                    folders.Add(this.GetKnownFolderById(id));
+                }
+                catch (Exception ex)
+                {
+                    this.WriteError(new ErrorRecord(
+                        ex,
+                        "KnownFolderNotFound",
+                        ErrorCategory.ObjectNotFound,
+                        id.value));
+                }
+            }
+            return folders;
         }
 
         private IEnumerable<IKnownFolder> GetByNames(IEnumerable<string> names)
         {
-            return names.Select(name => this.GetKnownFolderByName(name));
+            return names.Select(name => this.GetKnownFolderByName(name)).ToList();
         }
 
         private IEnumerable<IKnownFolder> GetByIds(IEnumerable<Guid> folderIds)
         {
-            return folderIds.Select(folderId => this.GetKnownFolderById(new KNOWNFOLDERID(folderId.ToString())));
+            return folderIds.Select(folderId => this.GetKnownFolderById(new KNOWNFOLDERID(folderId.ToString()))).ToList();
         }
 
         private IKnownFolder GetKnownFolderById(KNOWNFOLDERID knownFolderId)
