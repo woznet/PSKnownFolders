@@ -8,6 +8,14 @@ using WozDev.PSKnownFolders.Win32;
 
 namespace WozDev.PSKnownFolders
 {
+    /// <summary>
+    /// <para type="synopsis">Retrieves one or more Windows Known Folders.</para>
+    /// <para type="description">
+    /// Gets <see cref="KnownFolder"/> objects representing Windows Shell Known Folders.
+    /// Results can be filtered by name, GUID, <see cref="System.Environment.SpecialFolder"/> value,
+    /// or by the built-in per-user, public, or all-folders parameter sets.
+    /// </para>
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, "PSKnownFolder", DefaultParameterSetName = "PerUser")]
     [Alias("Get-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
@@ -39,31 +47,39 @@ namespace WozDev.PSKnownFolders
 
         private IKnownFolderManager _knownFolderManager;
 
+        /// <summary>Gets or sets the canonical name(s) of the Known Folder(s) to retrieve.</summary>
         [Parameter(ParameterSetName = "ByName", Mandatory = true, Position = 0)]
         public string[] Name { get; set; }
 
+        /// <summary>Gets or sets the GUID(s) of the Known Folder(s) to retrieve.</summary>
         [Parameter(ParameterSetName = "ByFolderId", Mandatory = true, Position = 0)]
         public Guid[] FolderId { get; set; }
 
+        /// <summary>Gets or sets the <see cref="System.Environment.SpecialFolder"/> value(s) identifying the folder(s) to retrieve.</summary>
         [Parameter(ParameterSetName = "BySpecialFolder", Mandatory = true, Position = 0)]
         public Environment.SpecialFolder[] SpecialFolder { get; set; }
 
+        /// <summary>Gets or sets a value indicating that all registered Known Folders should be returned.</summary>
         [Parameter(ParameterSetName = "All")]
         public SwitchParameter All { get; set; }
 
+        /// <summary>Gets or sets a value indicating that only public (shared) Known Folders should be returned.</summary>
         [Alias("Common")]
         [Parameter(ParameterSetName = "Public")]
         public SwitchParameter Public { get; set; }
 
+        /// <summary>Gets or sets a value indicating that only per-user Known Folders should be returned.</summary>
         [Alias("User")]
         [Parameter(ParameterSetName = "PerUser")]
         public SwitchParameter PerUser { get; set; }
 
+        /// <inheritdoc/>
         protected override void BeginProcessing()
         {
             _knownFolderManager = (IKnownFolderManager)new KnownFolderManager();
         }
 
+        /// <inheritdoc/>
         protected override void ProcessRecord()
         {
             IEnumerable<IKnownFolder> result;
@@ -194,6 +210,7 @@ namespace WozDev.PSKnownFolders
             return nativeKnownFolder;
         }
 
+        /// <summary>Releases the COM <see cref="IKnownFolderManager"/> instance.</summary>
         public void Dispose()
         {
             if (_knownFolderManager != null)

@@ -4,6 +4,86 @@
         <name>PSKnownFolders</name>
     </assembly>
     <members>
+        <member name="T:WozDev.PSKnownFolders.GetKnownFolderCommand">
+            <summary>
+            <para type="synopsis">Retrieves one or more Windows Known Folders.</para>
+            <para type="description">
+            Gets <see cref="T:WozDev.PSKnownFolders.KnownFolder"/> objects representing Windows Shell Known Folders.
+            Results can be filtered by name, GUID, <see cref="T:System.Environment.SpecialFolder"/> value,
+            or by the built-in per-user, public, or all-folders parameter sets.
+            </para>
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.GetKnownFolderCommand.Name">
+            <summary>Gets or sets the canonical name(s) of the Known Folder(s) to retrieve.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.GetKnownFolderCommand.FolderId">
+            <summary>Gets or sets the GUID(s) of the Known Folder(s) to retrieve.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.GetKnownFolderCommand.SpecialFolder">
+            <summary>Gets or sets the <see cref="T:System.Environment.SpecialFolder"/> value(s) identifying the folder(s) to retrieve.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.GetKnownFolderCommand.All">
+            <summary>Gets or sets a value indicating that all registered Known Folders should be returned.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.GetKnownFolderCommand.Public">
+            <summary>Gets or sets a value indicating that only public (shared) Known Folders should be returned.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.GetKnownFolderCommand.PerUser">
+            <summary>Gets or sets a value indicating that only per-user Known Folders should be returned.</summary>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.GetKnownFolderCommand.BeginProcessing">
+            <inheritdoc/>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.GetKnownFolderCommand.ProcessRecord">
+            <inheritdoc/>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.GetKnownFolderCommand.Dispose">
+            <summary>Releases the COM <see cref="T:WozDev.PSKnownFolders.Win32.IKnownFolderManager"/> instance.</summary>
+        </member>
+        <member name="T:WozDev.PSKnownFolders.MoveKnownFolderCommand">
+            <summary>
+            <para type="synopsis">Redirects (moves) a Windows Known Folder to a new path.</para>
+            <para type="description">
+            Calls the Shell Known Folder redirection API to change where a Known Folder is stored on disk.
+            Supports moving a single folder by value or multiple folders from the pipeline, with optional
+            data migration, read-only probing via <c>-CheckOnly</c>, and pass-through output.
+            </para>
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.SingleFolder">
+            <summary>Gets or sets the Known Folder to redirect (single-folder parameter set).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.NewPath">
+            <summary>Gets or sets the new absolute path for the folder (single-folder parameter set).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.Folder">
+            <summary>Gets or sets the Known Folder piped from the pipeline (multiple-folders parameter set).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.Destination">
+            <summary>Gets or sets the destination base directory; the folder's existing directory name is appended automatically (multiple-folders parameter set).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.Force">
+            <summary>Gets or sets a value indicating that the <c>ShouldContinue</c> confirmation prompt should be suppressed.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.CheckOnly">
+            <summary>Gets or sets a value indicating that the redirection should only be validated without making changes.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.PassThru">
+            <summary>Gets or sets a value indicating that the redirected <see cref="T:WozDev.PSKnownFolders.KnownFolder"/> object should be emitted to the pipeline.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.MoveKnownFolderCommand.DontMoveExistingData">
+            <summary>Gets or sets a value indicating that existing data in the source folder should not be moved to the new location.</summary>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.MoveKnownFolderCommand.BeginProcessing">
+            <inheritdoc/>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.MoveKnownFolderCommand.ProcessRecord">
+            <inheritdoc/>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.MoveKnownFolderCommand.Dispose">
+            <summary>Releases the COM <see cref="T:WozDev.PSKnownFolders.Win32.IKnownFolderManager"/> instance.</summary>
+        </member>
         <member name="T:WozDev.PSKnownFolders.Win32.HResult">
             <summary>
             Common <c>HRESULT</c> values obtained from <see href="http://msdn.microsoft.com/en-us/windows/desktop/aa378137(v=vs.85).aspx" />.
