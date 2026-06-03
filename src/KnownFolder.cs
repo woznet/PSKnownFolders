@@ -138,6 +138,11 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        internal void InvalidateDefinitionCache()
+        {
+            this.definition = null;
+        }
+
         private void ThrowIfDisposed()
         {
             if (_disposed)

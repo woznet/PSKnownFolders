@@ -87,14 +87,21 @@ namespace WozDev.PSKnownFolders
             }
 
             string currentPath = folder.Path;
-            if (!this.ShouldProcess(folder.Name, string.Format("Redirect from {0} to {1}", currentPath, newPath)))
+            if (!this.CheckOnly)
             {
-                return;
-            }
+                if (!this.ShouldProcess(folder.Name, string.Format("Move from '{0}' to '{1}'", currentPath, newPath)))
+                {
+                    return;
+                }
 
-            if (!this.Force && !this.ShouldContinue("Do it?", "Folder redirection", ref this.yesToAll, ref this.noToAll))
-            {
-                return;
+                if (!this.Force && !this.ShouldContinue(
+                    string.Format("Move folder '{0}' from '{1}' to '{2}'?", folder.Name, currentPath, newPath),
+                    "Confirm folder redirection",
+                    ref this.yesToAll,
+                    ref this.noToAll))
+                {
+                    return;
+                }
             }
 
             var id = new KNOWNFOLDERID(folder.FolderId);
@@ -130,6 +137,7 @@ namespace WozDev.PSKnownFolders
 
             if (this.PassThru)
             {
+                folder.InvalidateDefinitionCache();
                 this.WriteObject(folder);
             }
         }
