@@ -1,6 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 
 namespace WozDev.PSKnownFolders.Win32
@@ -64,7 +62,7 @@ namespace WozDev.PSKnownFolders.Win32
         {
             if (KnownFolder == null)
             {
-                throw new ArgumentNullException("KnownFolder");
+                throw new ArgumentNullException(nameof(KnownFolder));
             }
 
             KNOWNFOLDER_DEFINITION def;
@@ -73,22 +71,14 @@ namespace WozDev.PSKnownFolders.Win32
             {
                 KNOWNFOLDER_DEFINITION_RAW rawDef;
 
-                RuntimeHelpers.PrepareConstrainedRegions();
+                KnownFolder.GetFolderDefinition(out rawDef);
                 try
                 {
+                    handles.SecureHandles(ref rawDef);
                 }
                 finally
                 {
-                    KnownFolder.GetFolderDefinition(out rawDef);
-                    try
-                    {
-                        handles.SecureHandles(ref rawDef);
-                    }
-                    finally
-                    {
-                        // in case SecureHandles throws
-                        rawDef.FreeKnownFolderDefinitionFields();
-                    }
+                    rawDef.FreeKnownFolderDefinitionFields();
                 }
 
                 def = new KNOWNFOLDER_DEFINITION(ref rawDef, handles);
@@ -99,34 +89,21 @@ namespace WozDev.PSKnownFolders.Win32
 
         private static string UnmarshalString(SafeCoTaskMemHandle hValue, string handleName)
         {
-            string value;
-            bool success;
-
-            RuntimeHelpers.PrepareConstrainedRegions();
-            try
-            {
-            }
-            finally
-            {
-                success = false;
-                hValue.DangerousAddRef(ref success);
-                if (success)
-                {
-                    value = Marshal.PtrToStringUni(hValue.DangerousGetHandle());
-                    hValue.DangerousRelease();
-                }
-                else
-                {
-                    value = null;
-                }
-            }
-
+            bool success = false;
+            hValue.DangerousAddRef(ref success);
             if (!success)
             {
                 throw new InvalidOperationException("Failed to AddRef on " + handleName);
             }
 
-            return value;
+            try
+            {
+                return Marshal.PtrToStringUni(hValue.DangerousGetHandle());
+            }
+            finally
+            {
+                hValue.DangerousRelease();
+            }
         }
 
         private sealed class KnownFolderDefinitionHandles : IDisposable
@@ -147,7 +124,6 @@ namespace WozDev.PSKnownFolders.Win32
 
             public readonly SafeCoTaskMemHandle hSecurity = new SafeCoTaskMemHandle();
 
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             public void SecureHandles(ref KNOWNFOLDER_DEFINITION_RAW d)
             {
                 SecureHandle(this.hName, ref d.pszName);
@@ -173,7 +149,6 @@ namespace WozDev.PSKnownFolders.Win32
                 GC.SuppressFinalize(this);
             }
 
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             private static void SecureHandle(SafeCoTaskMemHandle handle, ref IntPtr ptr)
             {
                 handle.SetHandle(ptr);
