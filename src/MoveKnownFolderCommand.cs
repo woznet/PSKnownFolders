@@ -9,7 +9,7 @@ namespace WozDev.PSKnownFolders
     [Cmdlet(VerbsCommon.Move, "PSKnownFolder", DefaultParameterSetName = "SingleFolder", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.High)]
     [Alias("Move-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
-    public sealed class RedirectKnownFolderCommand : PSCmdlet, IDisposable
+    public sealed class MoveKnownFolderCommand : PSCmdlet, IDisposable
     {
         private IKnownFolderManager _knownFolderManager;
 
