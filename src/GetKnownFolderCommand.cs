@@ -11,7 +11,7 @@ namespace WozDev.PSKnownFolders
     [Cmdlet(VerbsCommon.Get, "PSKnownFolder", DefaultParameterSetName = "PerUser")]
     [Alias("Get-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
-    public sealed class GetKnownFolderCommand : PSCmdlet
+    public sealed class GetKnownFolderCommand : PSCmdlet, IDisposable
     {
         private static readonly HashSet<Guid> UserFolders = new HashSet<Guid>
         {
@@ -37,7 +37,7 @@ namespace WozDev.PSKnownFolders
             KnownFolderIds.FOLDERID_PublicVideos.value,
         };
 
-        private IKnownFolderManager KnownFolderManager;
+        private IKnownFolderManager _knownFolderManager;
 
         [Parameter(ParameterSetName = "ByName", Mandatory = true, Position = 0)]
         public string[] Name { get; set; }
@@ -61,7 +61,7 @@ namespace WozDev.PSKnownFolders
 
         protected override void BeginProcessing()
         {
-            this.KnownFolderManager = (IKnownFolderManager)new KnownFolderManager();
+            _knownFolderManager = (IKnownFolderManager)new KnownFolderManager();
         }
 
         protected override void ProcessRecord()
@@ -123,7 +123,7 @@ namespace WozDev.PSKnownFolders
             {
                 Marshal.WriteIntPtr(ppIds, IntPtr.Zero);
                 uint count = 0;
-                this.KnownFolderManager.GetFolderIds(ppIds, ref count);
+                _knownFolderManager.GetFolderIds(ppIds, ref count);
                 IntPtr pIds = Marshal.ReadIntPtr(ppIds);
                 if (pIds == IntPtr.Zero)
                 {
@@ -170,7 +170,7 @@ namespace WozDev.PSKnownFolders
             IKnownFolder nativeKnownFolder;
             try
             {
-                this.KnownFolderManager.GetFolder(ref knownFolderId, out nativeKnownFolder);
+                _knownFolderManager.GetFolder(ref knownFolderId, out nativeKnownFolder);
             }
             catch (FileNotFoundException x)
             {
@@ -185,7 +185,7 @@ namespace WozDev.PSKnownFolders
             IKnownFolder nativeKnownFolder;
             try
             {
-                this.KnownFolderManager.GetFolderByName(name, out nativeKnownFolder);
+                _knownFolderManager.GetFolderByName(name, out nativeKnownFolder);
             }
             catch (FileNotFoundException x)
             {
@@ -193,6 +193,15 @@ namespace WozDev.PSKnownFolders
             }
 
             return nativeKnownFolder;
+        }
+
+        public void Dispose()
+        {
+            if (_knownFolderManager != null)
+            {
+                Marshal.ReleaseComObject(_knownFolderManager);
+                _knownFolderManager = null;
+            }
         }
     }
 }

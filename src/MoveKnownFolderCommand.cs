@@ -9,9 +9,9 @@ namespace WozDev.PSKnownFolders
     [Cmdlet(VerbsCommon.Move, "PSKnownFolder", DefaultParameterSetName = "SingleFolder", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.High)]
     [Alias("Move-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
-    public sealed class RedirectKnownFolderCommand : PSCmdlet
+    public sealed class RedirectKnownFolderCommand : PSCmdlet, IDisposable
     {
-        private IKnownFolderManager KnownFolderManager;
+        private IKnownFolderManager _knownFolderManager;
 
         private bool yesToAll;
 
@@ -43,7 +43,7 @@ namespace WozDev.PSKnownFolders
 
         protected override void BeginProcessing()
         {
-            this.KnownFolderManager = (IKnownFolderManager)new KnownFolderManager();
+            _knownFolderManager = (IKnownFolderManager)new KnownFolderManager();
         }
 
         protected override void ProcessRecord()
@@ -110,7 +110,7 @@ namespace WozDev.PSKnownFolders
             }
 
             string error;
-            HResult hr = this.KnownFolderManager.Redirect(ref id, IntPtr.Zero, flags, newPath, 0, null, out error);
+            HResult hr = _knownFolderManager.Redirect(ref id, IntPtr.Zero, flags, newPath, 0, null, out error);
             int hrCode = unchecked((int)hr);
             if (hrCode < 0)
             {
@@ -131,6 +131,15 @@ namespace WozDev.PSKnownFolders
             if (this.PassThru)
             {
                 this.WriteObject(folder);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_knownFolderManager != null)
+            {
+                Marshal.ReleaseComObject(_knownFolderManager);
+                _knownFolderManager = null;
             }
         }
     }
