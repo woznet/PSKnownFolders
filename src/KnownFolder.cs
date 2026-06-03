@@ -5,6 +5,9 @@ using WozDev.PSKnownFolders.Win32;
 
 namespace WozDev.PSKnownFolders
 {
+    /// <summary>
+    /// Represents a Windows Shell Known Folder and exposes its properties and lifetime management.
+    /// </summary>
     public sealed class KnownFolder : IDisposable
     {
         private IKnownFolder nativeKnownFolder;
@@ -23,6 +26,7 @@ namespace WozDev.PSKnownFolders
             this.nativeKnownFolder = nativeKnownFolder;
         }
 
+        /// <summary>Gets the canonical name of this Known Folder (e.g. <c>"Documents"</c>).</summary>
         public string Name
         {
             get
@@ -31,6 +35,10 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>
+        /// Gets the file-system path of this Known Folder, or <see langword="null"/> if the
+        /// folder has no physical path or the path could not be retrieved.
+        /// </summary>
         public string Path
         {
             get
@@ -58,6 +66,10 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>
+        /// Gets whether this Known Folder can be redirected (moved) to a different path.
+        /// Returns <see langword="false"/> if the folder has deny-all or lacks allow-all redirection capabilities.
+        /// </summary>
         public bool CanRedirect
         {
             get
@@ -70,6 +82,7 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>Gets the category (scope) of this Known Folder.</summary>
         public KnownFolderCategory Category
         {
             get
@@ -81,6 +94,7 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>Gets the unique identifier (GUID) of this Known Folder.</summary>
         public Guid FolderId
         {
             get
@@ -92,6 +106,9 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>
+        /// Gets the folder type GUID of this Known Folder, or <see langword="null"/> if the folder has no type assigned.
+        /// </summary>
         public Guid? FolderTypeId
         {
             get
@@ -111,6 +128,7 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>Gets the full definition metadata for this Known Folder as reported by the Shell.</summary>
         public KnownFolderDefinition Definition
         {
             get
@@ -125,6 +143,7 @@ namespace WozDev.PSKnownFolders
             }
         }
 
+        /// <summary>Releases the underlying COM Known Folder object.</summary>
         public void Dispose()
         {
             if (!_disposed)

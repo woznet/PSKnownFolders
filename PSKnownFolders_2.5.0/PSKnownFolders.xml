@@ -41,6 +41,143 @@
         <member name="M:WozDev.PSKnownFolders.GetKnownFolderCommand.Dispose">
             <summary>Releases the COM <see cref="T:WozDev.PSKnownFolders.Win32.IKnownFolderManager"/> instance.</summary>
         </member>
+        <member name="T:WozDev.PSKnownFolders.KnownFolder">
+            <summary>
+            Represents a Windows Shell Known Folder and exposes its properties and lifetime management.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.Name">
+            <summary>Gets the canonical name of this Known Folder (e.g. <c>"Documents"</c>).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.Path">
+            <summary>
+            Gets the file-system path of this Known Folder, or <see langword="null"/> if the
+            folder has no physical path or the path could not be retrieved.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.CanRedirect">
+            <summary>
+            Gets whether this Known Folder can be redirected (moved) to a different path.
+            Returns <see langword="false"/> if the folder has deny-all or lacks allow-all redirection capabilities.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.Category">
+            <summary>Gets the category (scope) of this Known Folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.FolderId">
+            <summary>Gets the unique identifier (GUID) of this Known Folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.FolderTypeId">
+            <summary>
+            Gets the folder type GUID of this Known Folder, or <see langword="null"/> if the folder has no type assigned.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolder.Definition">
+            <summary>Gets the full definition metadata for this Known Folder as reported by the Shell.</summary>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.KnownFolder.Dispose">
+            <summary>Releases the underlying COM Known Folder object.</summary>
+        </member>
+        <member name="T:WozDev.PSKnownFolders.KnownFolderCategory">
+            <summary>
+            Describes the category (scope) of a Windows Shell Known Folder,
+            corresponding to the <c>KF_CATEGORY</c> native enumeration.
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderCategory.Virtual">
+            <summary>A virtual folder that does not have a physical path on disk.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderCategory.Fixed">
+            <summary>A fixed folder whose path cannot be redirected.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderCategory.Common">
+            <summary>A common (shared/public) folder shared by all users.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderCategory.PerUser">
+            <summary>A per-user folder that exists separately for each user profile.</summary>
+        </member>
+        <member name="T:WozDev.PSKnownFolders.KnownFolderDefinition">
+            <summary>
+            Exposes the definition metadata (<c>KNOWNFOLDER_DEFINITION</c>) for a Windows Shell Known Folder,
+            including its name, paths, description strings, parent GUID, and behavioural flags.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Name">
+            <summary>Gets the canonical name of the Known Folder (e.g. <c>"Documents"</c>).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.ParsingName">
+            <summary>Gets the Shell namespace parsing name (e.g. <c>"::{…}"</c> or a file-system path).</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.LocalizedName">
+            <summary>Gets the localized display name resource string for the folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Description">
+            <summary>Gets the description string for the folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.ToolTip">
+            <summary>Gets the tooltip resource string for the folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Icon">
+            <summary>Gets the icon resource string for the folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Security">
+            <summary>Gets the SDDL security descriptor string applied when the folder is created.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.RelativePath">
+            <summary>Gets the path of the folder relative to its parent Known Folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.FolderTypeId">
+            <summary>
+            Gets the folder type GUID, or <see langword="null"/> if no type is defined.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.ParentId">
+            <summary>
+            Gets the GUID of the parent Known Folder, or <see langword="null"/> if there is no parent.
+            </summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Category">
+            <summary>Gets the category (scope) of the Known Folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Flags">
+            <summary>Gets the behavioural definition flags for the Known Folder.</summary>
+        </member>
+        <member name="P:WozDev.PSKnownFolders.KnownFolderDefinition.Attributes">
+            <summary>Gets the file-system attributes set on the folder when it is created.</summary>
+        </member>
+        <member name="M:WozDev.PSKnownFolders.KnownFolderDefinition.ToString">
+            <summary>Returns the canonical name of the Known Folder.</summary>
+        </member>
+        <member name="T:WozDev.PSKnownFolders.KnownFolderDefinitionFlags">
+            <summary>
+            Flags describing the behavioural definition of a Windows Shell Known Folder,
+            corresponding to the <c>KF_DEFINITION_FLAGS</c> native enumeration.
+            </summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.None">
+            <summary>No flags are set.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.Personalize">
+            <summary>The folder can be personalized per-user. Not documented in the Windows 8.1 SDK.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.LocalRedirectOnly">
+            <summary>The folder can only be redirected to a local path (not a network share).</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.Roamable">
+            <summary>The folder is roamable — its contents can follow the user across devices.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.PreCreate">
+            <summary>The folder should be created when the user's profile is initialized.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.Stream">
+            <summary>The folder is backed by a stream rather than a physical directory.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.PublishExpandedPath">
+            <summary>The folder's expanded path (with environment variables resolved) is published to the registry.</summary>
+        </member>
+        <member name="F:WozDev.PSKnownFolders.KnownFolderDefinitionFlags.NoRedirectUI">
+            <summary>No UI is shown to the user when redirecting this folder.</summary>
+        </member>
         <member name="T:WozDev.PSKnownFolders.MoveKnownFolderCommand">
             <summary>
             <para type="synopsis">Redirects (moves) a Windows Known Folder to a new path.</para>
