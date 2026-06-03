@@ -149,6 +149,6 @@ Both cmdlets return `WozDev.PSKnownFolders.KnownFolder` objects with the followi
 | `CanRedirect` | `bool` | Whether the folder can be redirected |
 | `Definition` | `KnownFolderDefinition` | Full definition metadata from the Shell |
 
-The object implements `IDisposable`. When stored in a variable, call `.Dispose()` when done,
-or let PowerShell manage lifetime by consuming results immediately in the pipeline.
+The object implements `IDisposable`. When stored in a variable, call `.Dispose()` when done (or use a `using` block in PowerShell 7+).
+PowerShell does not automatically call `Dispose()` for objects flowing through the pipeline, so otherwise cleanup may be delayed until garbage collection.
 
