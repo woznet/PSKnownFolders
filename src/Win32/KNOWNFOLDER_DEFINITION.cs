@@ -62,7 +62,7 @@ namespace WozDev.PSKnownFolders.Win32
         {
             if (KnownFolder == null)
             {
-                throw new ArgumentNullException("KnownFolder");
+                throw new ArgumentNullException(nameof(KnownFolder));
             }
 
             KNOWNFOLDER_DEFINITION def;

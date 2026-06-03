@@ -17,7 +17,7 @@ namespace WozDev.PSKnownFolders
         {
             if (nativeKnownFolder == null)
             {
-                throw new ArgumentNullException("nativeKnownFolder");
+                throw new ArgumentNullException(nameof(nativeKnownFolder));
             }
 
             this.nativeKnownFolder = nativeKnownFolder;
