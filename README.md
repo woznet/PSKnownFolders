@@ -43,13 +43,17 @@ name, GUID, or scope.
 #### Syntax
 
 ```
-Get-PSKnownFolder [-All] [<CommonParameters>]
+Get-PSKnownFolder [-PerUser] [<CommonParameters>]
 
-Get-PSKnownFolder -Name <string[]> [<CommonParameters>]
+Get-PSKnownFolder -Public [<CommonParameters>]
 
-Get-PSKnownFolder -FolderId <guid[]> [<CommonParameters>]
+Get-PSKnownFolder -All [<CommonParameters>]
 
-Get-PSKnownFolder [-PerUser] [-CommonFolders] [<CommonParameters>]
+Get-PSKnownFolder [-Name] <string[]> [<CommonParameters>]
+
+Get-PSKnownFolder [-FolderId] <guid[]> [<CommonParameters>]
+
+Get-PSKnownFolder [-SpecialFolder] <Environment+SpecialFolder[]> [<CommonParameters>]
 ```
 
 #### Parameters
@@ -59,8 +63,9 @@ Get-PSKnownFolder [-PerUser] [-CommonFolders] [<CommonParameters>]
 | `-All` | Switch | Return every registered known folder |
 | `-Name` | `string[]` | Filter by canonical folder name (e.g. `Desktop`, `Downloads`) |
 | `-FolderId` | `guid[]` | Filter by known folder GUID |
-| `-PerUser` | Switch | Include only user-scope folders |
-| `-CommonFolders` | Switch | Include only machine-wide (common) folders |
+| `-SpecialFolder` | `Environment+SpecialFolder[]` | Filter by .NET `SpecialFolder` value (e.g. `MyDocuments`) |
+| `-PerUser` | Switch | Return the standard per-user folders (default when no parameters are given). Alias: `-User` |
+| `-Public` | Switch | Return the standard public (shared) folders. Alias: `-Common` |
 
 #### Examples
 
@@ -79,6 +84,9 @@ Get-PSKnownFolder -FolderId '{374DE290-123F-4565-9164-39C4925E467B}'
 
 # List only per-user folders
 Get-PSKnownFolder -PerUser
+
+# List only public (shared) folders
+Get-PSKnownFolder -Public
 ```
 
 ---
@@ -109,7 +117,7 @@ Move-PSKnownFolder -Folder <KnownFolder> -Destination <string>
 | `-NewPath` | `string` | The target path (single-folder parameter set) |
 | `-Folder` | `KnownFolder` | Folder from the pipeline (multi-folder parameter set) |
 | `-Destination` | `string` | Base destination directory — each folder is placed in a matching sub-folder |
-| `-Force` | Switch | Suppress the high-impact confirmation prompt |
+| `-Force` | Switch | Skip the additional "Confirm folder redirection" (`ShouldContinue`) prompt. Does not suppress the `ShouldProcess` confirmation — use `-Confirm:$false` as well for unattended runs |
 | `-CheckOnly` | Switch | Validate the redirect without actually moving files |
 | `-PassThru` | Switch | Return the updated `KnownFolder` object after redirection |
 | `-DontMoveExistingData` | Switch | Register the new path without migrating existing contents |
@@ -137,7 +145,9 @@ Get-PSKnownFolder -PerUser |
 
 ## KnownFolder Object
 
-Both cmdlets return `WozDev.PSKnownFolders.KnownFolder` objects with the following properties:
+`Get-PSKnownFolder` returns `WozDev.PSKnownFolders.KnownFolder` objects. `Move-PSKnownFolder` emits the
+same object type only when `-PassThru` is specified; otherwise it produces no output. The object has the
+following properties:
 
 | Property | Type | Description |
 |---|---|---|
@@ -149,6 +159,17 @@ Both cmdlets return `WozDev.PSKnownFolders.KnownFolder` objects with the followi
 | `CanRedirect` | `bool` | Whether the folder can be redirected |
 | `Definition` | `KnownFolderDefinition` | Full definition metadata from the Shell |
 
-The object implements `IDisposable`. When stored in a variable, call `.Dispose()` when done (or use a `using` block in PowerShell 7+).
-PowerShell does not automatically call `Dispose()` for objects flowing through the pipeline, so otherwise cleanup may be delayed until garbage collection.
+The object implements `IDisposable`. PowerShell does not automatically call `Dispose()` for objects flowing
+through the pipeline, and it has no C#-style `using` block, so cleanup may otherwise be delayed until garbage
+collection. When you hold a folder in a variable, use `try`/`finally` to dispose it deterministically:
+
+```powershell
+$folder = Get-PSKnownFolder -Name Downloads
+try {
+    $folder.Path
+}
+finally {
+    $folder.Dispose()
+}
+```
 

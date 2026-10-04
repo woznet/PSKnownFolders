@@ -89,6 +89,7 @@ namespace WozDev.PSKnownFolders
                     result = this.GetByNames(this.Name);
                     break;
                 case "BySpecialFolder":
+                    Validate(this.SpecialFolder);
                     result = this.GetByNames(this.SpecialFolder.Select(sf => sf == Environment.SpecialFolder.Personal ? "Personal" : sf.ToString()));
                     break;
                 case "ByFolderId":
@@ -115,6 +116,17 @@ namespace WozDev.PSKnownFolders
             foreach (var folder in knownFolders)
             {
                 this.WriteObject(folder);
+            }
+        }
+
+        private static void Validate(IEnumerable<Environment.SpecialFolder> specialFolders)
+        {
+            foreach (var specialFolder in specialFolders)
+            {
+                if (!Enum.IsDefined(typeof(Environment.SpecialFolder), specialFolder))
+                {
+                    throw new ArgumentException("Invalid SpecialFolder value: " + specialFolder);
+                }
             }
         }
 
