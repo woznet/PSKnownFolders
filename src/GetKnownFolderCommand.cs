@@ -182,14 +182,46 @@ namespace WozDev.PSKnownFolders
             return folders;
         }
 
-        private IEnumerable<IKnownFolder> GetByNames(IEnumerable<string> names)
+        private List<IKnownFolder> GetByNames(IEnumerable<string> names)
         {
-            return names.Select(name => this.GetKnownFolderByName(name)).ToList();
+            var folders = new List<IKnownFolder>();
+            foreach (var name in names)
+            {
+                try
+                {
+                    folders.Add(this.GetKnownFolderByName(name));
+                }
+                catch (Exception ex)
+                {
+                    this.WriteError(new ErrorRecord(
+                        ex,
+                        "KnownFolderNotFoundByName",
+                        ErrorCategory.ObjectNotFound,
+                        name));
+                }
+            }
+            return folders;
         }
 
-        private IEnumerable<IKnownFolder> GetByIds(IEnumerable<Guid> folderIds)
+        private List<IKnownFolder> GetByIds(IEnumerable<Guid> folderIds)
         {
-            return folderIds.Select(folderId => this.GetKnownFolderById(new KNOWNFOLDERID(folderId.ToString()))).ToList();
+            var folders = new List<IKnownFolder>();
+            foreach (var folderId in folderIds)
+            {
+                try
+                {
+                    folders.Add(this.GetKnownFolderById(new KNOWNFOLDERID(folderId)));
+                }
+                catch (Exception ex)
+                {
+                    this.WriteError(new ErrorRecord(
+                        ex,
+                        "KnownFolderNotFoundById",
+                        ErrorCategory.ObjectNotFound,
+                        folderId));
+                }
+            }
+            return folders;
         }
 
         private IKnownFolder GetKnownFolderById(KNOWNFOLDERID knownFolderId)

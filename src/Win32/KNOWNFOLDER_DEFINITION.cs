@@ -69,11 +69,11 @@ namespace WozDev.PSKnownFolders.Win32
 
             using (var handles = new KnownFolderDefinitionHandles())
             {
-                KNOWNFOLDER_DEFINITION_RAW rawDef;
+                KNOWNFOLDER_DEFINITION_RAW rawDef = default(KNOWNFOLDER_DEFINITION_RAW);
 
-                KnownFolder.GetFolderDefinition(out rawDef);
                 try
                 {
+                    KnownFolder.GetFolderDefinition(out rawDef);
                     handles.SecureHandles(ref rawDef);
                 }
                 finally
