@@ -5,7 +5,7 @@
     <AssemblyName>PSKnownFolders</AssemblyName>
     <RootNamespace>WozDev.PSKnownFolders</RootNamespace>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SignAssembly>false</SignAssembly>
     <Title>WozDev.PSKnownFolders</Title>
     <Product>WozDev.PSKnownFolders</Product>
@@ -61,6 +61,8 @@
     <!-- Copy DLL -->
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ModuleOutputPath)" />
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).pdb" DestinationFolder="$(ModuleOutputPath)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).xml" DestinationFolder="$(ModuleOutputPath)"
+          Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
 
     <!-- Copy module files -->
     <Copy SourceFiles="@(Content)" DestinationFolder="$(ModuleOutputPath)" />

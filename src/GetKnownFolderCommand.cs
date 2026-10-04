@@ -8,10 +8,18 @@ using WozDev.PSKnownFolders.Win32;
 
 namespace WozDev.PSKnownFolders
 {
+    /// <summary>
+    /// <para type="synopsis">Retrieves one or more Windows Known Folders.</para>
+    /// <para type="description">
+    /// Gets <see cref="KnownFolder"/> objects representing Windows Shell Known Folders.
+    /// Results can be filtered by name, GUID, <see cref="System.Environment.SpecialFolder"/> value,
+    /// or by the built-in per-user, public, or all-folders parameter sets.
+    /// </para>
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, "PSKnownFolder", DefaultParameterSetName = "PerUser")]
     [Alias("Get-KnownFolder")]
     [OutputType(typeof(KnownFolder))]
-    public sealed class GetKnownFolderCommand : PSCmdlet
+    public sealed class GetKnownFolderCommand : PSCmdlet, IDisposable
     {
         private static readonly HashSet<Guid> UserFolders = new HashSet<Guid>
         {
@@ -37,33 +45,41 @@ namespace WozDev.PSKnownFolders
             KnownFolderIds.FOLDERID_PublicVideos.value,
         };
 
-        private IKnownFolderManager KnownFolderManager;
+        private IKnownFolderManager _knownFolderManager;
 
+        /// <summary>Gets or sets the canonical name(s) of the Known Folder(s) to retrieve.</summary>
         [Parameter(ParameterSetName = "ByName", Mandatory = true, Position = 0)]
         public string[] Name { get; set; }
 
+        /// <summary>Gets or sets the GUID(s) of the Known Folder(s) to retrieve.</summary>
         [Parameter(ParameterSetName = "ByFolderId", Mandatory = true, Position = 0)]
         public Guid[] FolderId { get; set; }
 
+        /// <summary>Gets or sets the <see cref="System.Environment.SpecialFolder"/> value(s) identifying the folder(s) to retrieve.</summary>
         [Parameter(ParameterSetName = "BySpecialFolder", Mandatory = true, Position = 0)]
         public Environment.SpecialFolder[] SpecialFolder { get; set; }
 
+        /// <summary>Gets or sets a value indicating that all registered Known Folders should be returned.</summary>
         [Parameter(ParameterSetName = "All")]
         public SwitchParameter All { get; set; }
 
+        /// <summary>Gets or sets a value indicating that only public (shared) Known Folders should be returned.</summary>
         [Alias("Common")]
         [Parameter(ParameterSetName = "Public")]
         public SwitchParameter Public { get; set; }
 
+        /// <summary>Gets or sets a value indicating that only per-user Known Folders should be returned.</summary>
         [Alias("User")]
         [Parameter(ParameterSetName = "PerUser")]
         public SwitchParameter PerUser { get; set; }
 
+        /// <inheritdoc/>
         protected override void BeginProcessing()
         {
-            this.KnownFolderManager = (IKnownFolderManager)new KnownFolderManager();
+            _knownFolderManager = (IKnownFolderManager)new KnownFolderManager();
         }
 
+        /// <inheritdoc/>
         protected override void ProcessRecord()
         {
             IEnumerable<IKnownFolder> result;
@@ -114,7 +130,7 @@ namespace WozDev.PSKnownFolders
             }
         }
 
-        private IEnumerable<IKnownFolder> GetAll()
+        private List<IKnownFolder> GetAll()
         {
             KNOWNFOLDERID[] ids;
 
@@ -123,7 +139,7 @@ namespace WozDev.PSKnownFolders
             {
                 Marshal.WriteIntPtr(ppIds, IntPtr.Zero);
                 uint count = 0;
-                this.KnownFolderManager.GetFolderIds(ppIds, ref count);
+                _knownFolderManager.GetFolderIds(ppIds, ref count);
                 IntPtr pIds = Marshal.ReadIntPtr(ppIds);
                 if (pIds == IntPtr.Zero)
                 {
@@ -133,12 +149,9 @@ namespace WozDev.PSKnownFolders
                 try
                 {
                     ids = new KNOWNFOLDERID[count];
-                    var ptr = pIds.ToInt64();
-                    for (uint u = 0; u < count; ++u)
-                    {
-                        ids[u] = (KNOWNFOLDERID)Marshal.PtrToStructure((IntPtr)ptr, typeof(KNOWNFOLDERID));
-                        ptr += Marshal.SizeOf(typeof(KNOWNFOLDERID));
-                    }
+                    int stride = Marshal.SizeOf<KNOWNFOLDERID>();
+                    for (int u = 0; u < (int)count; u++)
+                        ids[u] = Marshal.PtrToStructure<KNOWNFOLDERID>(IntPtr.Add(pIds, u * stride));
                 }
                 finally
                 {
@@ -150,19 +163,65 @@ namespace WozDev.PSKnownFolders
                 Marshal.FreeHGlobal(ppIds);
             }
 
-            var result = ids.Select(kfi => this.GetKnownFolderById(kfi));
-
-            return result;
+            var folders = new List<IKnownFolder>(ids.Length);
+            foreach (var id in ids)
+            {
+                try
+                {
+                    folders.Add(this.GetKnownFolderById(id));
+                }
+                catch (Exception ex)
+                {
+                    this.WriteError(new ErrorRecord(
+                        ex,
+                        "KnownFolderNotFound",
+                        ErrorCategory.ObjectNotFound,
+                        id.value));
+                }
+            }
+            return folders;
         }
 
-        private IEnumerable<IKnownFolder> GetByNames(IEnumerable<string> names)
+        private List<IKnownFolder> GetByNames(IEnumerable<string> names)
         {
-            return names.Select(name => this.GetKnownFolderByName(name));
+            var folders = new List<IKnownFolder>();
+            foreach (var name in names)
+            {
+                try
+                {
+                    folders.Add(this.GetKnownFolderByName(name));
+                }
+                catch (Exception ex)
+                {
+                    this.WriteError(new ErrorRecord(
+                        ex,
+                        "KnownFolderNotFoundByName",
+                        ErrorCategory.ObjectNotFound,
+                        name));
+                }
+            }
+            return folders;
         }
 
-        private IEnumerable<IKnownFolder> GetByIds(IEnumerable<Guid> folderIds)
+        private List<IKnownFolder> GetByIds(IEnumerable<Guid> folderIds)
         {
-            return folderIds.Select(folderId => this.GetKnownFolderById(new KNOWNFOLDERID(folderId.ToString())));
+            var folders = new List<IKnownFolder>();
+            foreach (var folderId in folderIds)
+            {
+                try
+                {
+                    folders.Add(this.GetKnownFolderById(new KNOWNFOLDERID(folderId)));
+                }
+                catch (Exception ex)
+                {
+                    this.WriteError(new ErrorRecord(
+                        ex,
+                        "KnownFolderNotFoundById",
+                        ErrorCategory.ObjectNotFound,
+                        folderId));
+                }
+            }
+            return folders;
         }
 
         private IKnownFolder GetKnownFolderById(KNOWNFOLDERID knownFolderId)
@@ -170,7 +229,7 @@ namespace WozDev.PSKnownFolders
             IKnownFolder nativeKnownFolder;
             try
             {
-                this.KnownFolderManager.GetFolder(ref knownFolderId, out nativeKnownFolder);
+                _knownFolderManager.GetFolder(ref knownFolderId, out nativeKnownFolder);
             }
             catch (FileNotFoundException x)
             {
@@ -185,7 +244,7 @@ namespace WozDev.PSKnownFolders
             IKnownFolder nativeKnownFolder;
             try
             {
-                this.KnownFolderManager.GetFolderByName(name, out nativeKnownFolder);
+                _knownFolderManager.GetFolderByName(name, out nativeKnownFolder);
             }
             catch (FileNotFoundException x)
             {
@@ -193,6 +252,16 @@ namespace WozDev.PSKnownFolders
             }
 
             return nativeKnownFolder;
+        }
+
+        /// <summary>Releases the COM <see cref="IKnownFolderManager"/> instance.</summary>
+        public void Dispose()
+        {
+            if (_knownFolderManager != null)
+            {
+                Marshal.ReleaseComObject(_knownFolderManager);
+                _knownFolderManager = null;
+            }
         }
     }
 }
