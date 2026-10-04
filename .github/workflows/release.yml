@@ -47,8 +47,9 @@ jobs:
             echo "::error file=src/PSKnownFolders.csproj::No <Version> found"
             exit 1
           fi
-          if ! grep -q "ModuleVersion = '$version'" src/ModuleFiles/PSKnownFolders.psd1; then
-            echo "::error file=src/ModuleFiles/PSKnownFolders.psd1::ModuleVersion does not match csproj Version $version"
+          manifest_version=$(sed -n "s/^[[:space:]]*ModuleVersion[[:space:]]*=[[:space:]]*['\"]\([^'\"]*\)['\"].*/\1/p" src/ModuleFiles/PSKnownFolders.psd1)
+          if [ "$manifest_version" != "$version" ]; then
+            echo "::error file=src/ModuleFiles/PSKnownFolders.psd1::ModuleVersion '$manifest_version' does not match csproj Version '$version'"
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
