@@ -20,7 +20,7 @@ Copy the module folder to any directory listed in `$env:PSModulePath`:
 
 ```powershell
 # Example — current user
-Copy-Item -Recurse PSKnownFolders_2.5.0 "$HOME\Documents\PowerShell\Modules\PSKnownFolders"
+Copy-Item -Recurse PSKnownFolders_2.5.1 "$HOME\Documents\PowerShell\Modules\PSKnownFolders"
 
 # Then import
 Import-Module PSKnownFolders
