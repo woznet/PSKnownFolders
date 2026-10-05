@@ -1,6 +1,6 @@
 name: Release
 
-# Builds the module and packages PSKnownFolders_<version>/ as PSKnownFolders.<version>.zip.
+# Builds the module and packages the PSKnownFolders/ module folder as PSKnownFolders.<version>.zip.
 # - Pull requests: build and package only, uploaded as a workflow artifact for review.
 # - Manual run (Actions tab > Release > Run workflow) on main: also tags the commit
 #   v<version> and publishes a GitHub release with the zip attached.
@@ -61,7 +61,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          cd "PSKnownFolders_$VERSION"
+          cd PSKnownFolders
           zip -X "$GITHUB_WORKSPACE/PSKnownFolders.$VERSION.zip" \
             PSKnownFolders.dll \
             PSKnownFolders.pdb \
