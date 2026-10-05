@@ -24,10 +24,14 @@ directory listed in `$env:PSModulePath`. The zip contains the `PSKnownFolders` m
 
 ```powershell
 # Example — current user
-Expand-Archive -Force .\PSKnownFolders.*.zip "$HOME\Documents\PowerShell\Modules\"
+$modules = "$HOME\Documents\PowerShell\Modules"
+New-Item -ItemType Directory -Force $modules | Out-Null
+
+# From a release zip
+Expand-Archive -Force .\PSKnownFolders.*.zip $modules
 
 # Or, from a clone of this repository, copy the module folder
-Copy-Item -Recurse -Force PSKnownFolders "$HOME\Documents\PowerShell\Modules\"
+Copy-Item -Recurse -Force PSKnownFolders $modules
 
 # Then import
 Import-Module PSKnownFolders
