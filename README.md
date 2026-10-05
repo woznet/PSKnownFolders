@@ -16,11 +16,20 @@ locations without manually editing the registry.
 
 ## Installation
 
-Copy the module folder to any directory listed in `$env:PSModulePath`:
+Download `PSKnownFolders.<version>.zip` from the [latest release](https://github.com/woznet/PSKnownFolders/releases/latest)
+and extract it into any directory listed in `$env:PSModulePath`. The zip contains the `PSKnownFolders` module folder.
+(Release zips up to v2.5.1 have the module files at the top level instead; extract those into a `PSKnownFolders` folder.)
 
 ```powershell
 # Example — current user
-Copy-Item -Recurse PSKnownFolders_2.5.1 "$HOME\Documents\PowerShell\Modules\PSKnownFolders"
+$modules = [System.IO.Path]::Combine(([environment]::GetFolderPath([System.Environment+SpecialFolder]::MyDocuments)), 'PowerShell\Modules')
+$null = New-Item -ItemType Directory -Force -Path $modules
+
+# From a release zip
+Expand-Archive -Force -Path .\PSKnownFolders.*.zip -DestinationPath $modules
+
+# Or, from a clone of this repository, copy the module folder
+Copy-Item -Recurse -Force -Path PSKnownFolders -Destination $modules
 
 # Then import
 Import-Module PSKnownFolders
@@ -37,8 +46,7 @@ Import-Module PSKnownFolders
 
 ### Get-PSKnownFolder
 
-Retrieves known folder objects. Use `-All` to list every registered folder or filter by
-name, GUID, or scope.
+Retrieves known folder objects. Use `-All` to list every registered folder or filter by name, GUID, or scope.
 
 #### Syntax
 
@@ -93,9 +101,8 @@ Get-PSKnownFolder -Public
 
 ### Move-PSKnownFolder
 
-Redirects a known folder to a new path. Supports single-folder and pipeline (multiple-folder)
-workflows. Uses `ShouldProcess` — pass `-WhatIf` to preview or `-Confirm` to gate each
-redirection interactively.
+Redirects a known folder to a new path. Supports single-folder and pipeline (multiple-folder) workflows.
+Uses `ShouldProcess` — pass `-WhatIf` to preview or `-Confirm` to gate each redirection interactively.
 
 #### Syntax
 
@@ -145,9 +152,8 @@ Get-PSKnownFolder -PerUser |
 
 ## KnownFolder Object
 
-`Get-PSKnownFolder` returns `WozDev.PSKnownFolders.KnownFolder` objects. `Move-PSKnownFolder` emits the
-same object type only when `-PassThru` is specified; otherwise it produces no output. The object has the
-following properties:
+`Get-PSKnownFolder` returns `WozDev.PSKnownFolders.KnownFolder` objects. `Move-PSKnownFolder` emits the same object
+type only when `-PassThru` is specified; otherwise it produces no output. The object has the following properties:
 
 | Property | Type | Description |
 |---|---|---|

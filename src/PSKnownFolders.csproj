@@ -51,8 +51,8 @@
   <!-- Post-build target to copy files -->
   <Target Name="CopyModuleFiles" AfterTargets="Build">
     <PropertyGroup>
-      <!-- Set destination folder using AssemblyName and Version -->
-      <ModuleOutputPath>$(MSBuildThisFileDirectory)..\$(AssemblyName)_$(Version)\</ModuleOutputPath>
+      <!-- Set destination folder using AssemblyName (matches the module name, so it can be copied straight into a PSModulePath directory) -->
+      <ModuleOutputPath>$(MSBuildThisFileDirectory)..\$(AssemblyName)\</ModuleOutputPath>
     </PropertyGroup>
 
     <!-- Ensure the output folder exists -->
