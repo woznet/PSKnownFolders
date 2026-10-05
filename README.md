@@ -22,7 +22,10 @@ and extract it into any directory listed in `$env:PSModulePath`. The zip contain
 
 ```powershell
 # Example — current user
-$modules = [System.IO.Path]::Combine(([environment]::GetFolderPath([System.Environment+SpecialFolder]::MyDocuments)), 'PowerShell\Modules')
+$modules = [System.IO.Path]::Combine(
+    ([environment]::GetFolderPath([System.Environment+SpecialFolder]::MyDocuments)),
+    'PowerShell\Modules'
+)
 $null = New-Item -ItemType Directory -Force -Path $modules
 
 # From a release zip
