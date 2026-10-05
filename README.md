@@ -16,10 +16,17 @@ locations without manually editing the registry.
 
 ## Installation
 
-Copy the module folder to any directory listed in `$env:PSModulePath`:
+Download `PSKnownFolders.<version>.zip` from the
+[latest release](https://github.com/woznet/PSKnownFolders/releases/latest) and extract it into any
+directory listed in `$env:PSModulePath`. The zip contains the `PSKnownFolders` module folder.
+(Release zips up to v2.5.1 have the module files at the top level instead; extract those into a
+`PSKnownFolders` folder.)
 
 ```powershell
 # Example — current user
+Expand-Archive -Force .\PSKnownFolders.*.zip "$HOME\Documents\PowerShell\Modules\"
+
+# Or, from a clone of this repository, copy the module folder
 Copy-Item -Recurse -Force PSKnownFolders "$HOME\Documents\PowerShell\Modules\"
 
 # Then import
